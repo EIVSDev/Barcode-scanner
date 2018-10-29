@@ -27,22 +27,5 @@ public class ProductManager {
 
     }
 
-    public void Add(ProductModel c) {
-        pm.add(c);
-    }
 
-    public void Remove(ProductModel c) {
-        pm.remove(c);
-    }
-
-
-
-/*    public void Add(Integer c) {
-        list.add(c);
-    }
-
-    public boolean Remove(Integer c) {
-        list.remove(c);
-        return true;
-    }*/
 }

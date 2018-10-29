@@ -14,12 +14,6 @@
         android:layout_height="match_parent"
         android:padding="10dp">
 
-<!--        <com.hitomi.cmlibrary.CircleMenu
-            android:id="@+id/circle_menu"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />-->
-
-
     </android.support.v7.widget.RecyclerView>
 
     <TextView

@@ -23,8 +23,6 @@ public class ProductModel {
         this.id = id;
         this.image = image;
     }
-///////////////////////////////////////
-
 
     public String getDescription() {
         return description;

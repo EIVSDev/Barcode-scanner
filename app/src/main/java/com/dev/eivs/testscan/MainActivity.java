@@ -1,17 +1,20 @@
 package com.dev.eivs.testscan;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+
+import com.dev.eivs.testscan.activity.CameraActivity;
+import com.dev.eivs.testscan.adapter.ProductAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,21 +24,20 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SELECT_PICTURE = 1;
     private static final int SCAN_PICTURE = 2;
-    public String selectedImageUri;
     public String resutScan;
     private RecyclerView recyclerView;
     List<ProductModel> result;
+    ProductManager productManager = new ProductManager();
     private ProductAdapter adapter;
-
     TextView emptyText;
 
-
+    private int requestedIndex;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        new ItemTask().execute();
+
     }
 
     private void init() {
@@ -47,12 +49,24 @@ public class MainActivity extends AppCompatActivity {
         GridLayoutManager glm = new GridLayoutManager(this, 3);
         glm.setOrientation(LinearLayoutManager.VERTICAL);
         result = new ArrayList<>();
+        result = productManager.pm;
+        adapter = new ProductAdapter(result);
         recyclerView.setLayoutManager(glm);
+        recyclerView.setAdapter(adapter);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addProduct();
+                checkIfEmty();
+
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -63,15 +77,13 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 removeProduct(item.getGroupId());
+                checkIfEmty();
                 break;
             case 1:
-                addProduct();
+                updateItemText(item.getGroupId());
                 break;
             case 2:
-                updateItemText(item.getGroupId(), resutScan);
-                break;
-            case 3:
-                updateItemImage(item.getGroupId(), selectedImageUri);
+                updateItemImage(item.getGroupId());
                 break;
         }
         return super.onContextItemSelected(item);
@@ -87,21 +99,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class ItemTask extends AsyncTask<Void, Void, ProductManager> {
-
-        @Override
-        protected ProductManager doInBackground(Void... voids) {
-            return new ProductManager();
-        }
-
-        @Override
-        protected void onPostExecute(ProductManager models) {
-            result = models.pm;
-            adapter = new ProductAdapter(result);
-            recyclerView.setAdapter(adapter);
-            //adapter.notifyDataSetChanged();
-        }
-    }
 
     private void removeProduct(int position) {
         result.remove(position);
@@ -116,33 +113,42 @@ public class MainActivity extends AppCompatActivity {
         adapter.notifyItemRangeChanged(0, result.size());
     }
 
-    private void updateItemText(int position, String text) {
+    private void updateItemText(int index) {
+        requestedIndex = index;
         Intent intent = new Intent(this, CameraActivity.class);
         startActivityForResult(intent, SCAN_PICTURE);
-        result.get(position).setDescription(text);
-        adapter.notifyItemChanged(position);
+
     }
 
-    private void updateItemImage(int index, String url) { // выбор изображения
-
+    private void updateItemImage(int index) {
+        requestedIndex = index;
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
-        result.get(index).setUrl(url);
-        adapter.notifyItemChanged(index);
     }
-
+    private void checkIfEmty(){
+        if(result.size() == 0){
+            recyclerView.setVisibility(View.INVISIBLE);
+            emptyText.setVisibility(View.VISIBLE);
+        }else{
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.INVISIBLE);
+        }
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             if (requestCode == SELECT_PICTURE) {
-                selectedImageUri = String.valueOf(data.getData());
+              String selectedImageUri = String.valueOf(data.getData());
+                result.get(requestedIndex).setUrl(selectedImageUri);
+                adapter.notifyItemChanged(requestedIndex);
             } else if (requestCode == SCAN_PICTURE) {
                 resutScan = data.getStringExtra("name");
+                result.get(requestedIndex).setDescription(resutScan);
+                adapter.notifyItemChanged(requestedIndex);
 
-                Log.e("____>", resutScan);
             }
         }
     }

@@ -4,7 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 28
     defaultConfig {
-        archivesBaseName="Barcode Scanner"
+        archivesBaseName = "Barcode Scanner"
         applicationId "com.dev.eivs.testscan"
         minSdkVersion 21
         targetSdkVersion 28
@@ -35,11 +35,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-ml-vision:17.0.0'
 
-    implementation'com.android.support:recyclerview-v7:28+'
-    implementation'com.android.support:cardview-v7:28+'
+    implementation 'com.android.support:recyclerview-v7:28+'
+    implementation 'com.android.support:cardview-v7:28+'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation'gr.pantrif:easy-android-splash-screen:0.0.1'
+    implementation 'gr.pantrif:easy-android-splash-screen:0.0.1'
 
-    implementation'com.github.Hitomis:CircleMenu:v1.0.2'
+    implementation 'com.github.Hitomis:CircleMenu:v1.0.2'
 }
